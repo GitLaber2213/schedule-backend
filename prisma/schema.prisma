@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  login    String @unique
+  password String
+}
+
+model Tariffication {
+  id                Int           @id @default(autoincrement())
+  discipline        Disciplines   @relation(fields: [disciplineID], references: [id])
+  disciplineID      Int
+  group             Groups        @relation(fields: [groupID], references: [id])
+  groupID           Int
+  subGroup          String
+  teacher           Teachers      @relation(fields: [teacherID], references: [id])
+  teacherID         Int
+  activityType      ActivityTypes @relation(fields: [activityTypeID], references: [id])
+  activityTypeID    Int
+  activityYearHours Int
+  Activity          Activity[]    @relation()
+}
+
+model Groups {
+  id             Int             @id @default(autoincrement())
+  groupName      String
+  tariffications Tariffication[] @relation()
+}
+
+model Disciplines {
+  id             Int             @id @default(autoincrement())
+  disciplineName String
+  tariffications Tariffication[] @relation()
+}
+
+model ClassRooms {
+  id            Int        @id @default(autoincrement())
+  classRoomName String
+  activity      Activity[]
+}
+
+model ActivityTypes {
+  id             Int             @id @default(autoincrement())
+  activityType   String
+  tarrifications Tariffication[] @relation()
+}
+
+model Teachers {
+  id             Int             @id @default(autoincrement())
+  fullName       String
+  tariffications Tariffication[] @relation()
+}
+
+model Schedule {
+  id             Int        @id @default(autoincrement())
+  date           DateTime
+  activitiesList Activity[]
+}
+
+model Activity {
+  id              Int           @id @default(autoincrement())
+  time            String
+  classRoom       ClassRooms    @relation(fields: [classRoomID], references: [id])
+  classRoomID     Int
+  activityHours   Int
+  tariffication   Tariffication @relation(fields: [tarifficationID], references: [id])
+  tarifficationID Int
+  scheduleId      Int
+  schedule        Schedule      @relation(fields: [scheduleId], references: [id])
+
+  @@map("activities")
+}
